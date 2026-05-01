@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,15 +12,20 @@ import { Building2, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function ChangePasswordPage() {
+  const [email, setEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
+
+    if (!email) {
+      toast.error('Email is required')
+      return
+    }
 
     if (newPassword !== confirmPassword) {
       toast.error('Passwords do not match')
@@ -35,22 +40,27 @@ export default function ChangePasswordPage() {
     setIsLoading(true)
 
     try {
-      // Force update password directly
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password: newPassword }),
       })
 
-      if (updateError) {
-        toast.error(updateError.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to change password')
         return
       }
 
       setIsSuccess(true)
       toast.success('Password changed successfully!')
       
-      // Redirect to dashboard after a short delay
+      // Redirect to login after a short delay
       setTimeout(() => {
-        router.push('/dashboard')
+        router.push('/auth/login')
       }, 2000)
     } catch {
       toast.error('An unexpected error occurred')
@@ -95,12 +105,24 @@ export default function ChangePasswordPage() {
           <div>
             <CardTitle className="text-2xl font-semibold tracking-tight">Change password</CardTitle>
             <CardDescription className="text-muted-foreground mt-1">
-              Enter your new password below
+              Enter the user&apos;s email and new password
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleChangePassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter user's email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="newPassword">New password</Label>
               <Input
