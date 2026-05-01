@@ -107,7 +107,7 @@ export function ClientFormDialog({
       pincode: '',
       contact_person: '',
       status: 'active',
-      assigned_to: '',
+      assigned_to: 'unassigned',
       notes: '',
     },
   })
@@ -129,7 +129,7 @@ export function ClientFormDialog({
         pincode: client.pincode || '',
         contact_person: client.contact_person || '',
         status: client.status,
-        assigned_to: client.assigned_to || '',
+        assigned_to: client.assigned_to || 'unassigned',
         notes: client.notes || '',
       })
     } else {
@@ -172,7 +172,7 @@ export function ClientFormDialog({
         state: values.state || null,
         pincode: values.pincode || null,
         contact_person: values.contact_person || null,
-        assigned_to: values.assigned_to || null,
+        assigned_to: values.assigned_to === 'unassigned' ? null : (values.assigned_to || null),
         notes: values.notes || null,
         ...(isEditing ? {} : { created_by: user?.id }),
       }
@@ -485,7 +485,7 @@ export function ClientFormDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">Unassigned</SelectItem>
+                            <SelectItem value="unassigned">Unassigned</SelectItem>
                             {members.map((member) => (
                               <SelectItem key={member.id} value={member.id}>
                                 {member.full_name}
