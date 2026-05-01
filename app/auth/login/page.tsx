@@ -23,12 +23,20 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log("[v0] Attempting login with email:", email)
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
+      console.log("[v0] Login response - data:", data, "error:", error)
+
       if (error) {
+        console.log("[v0] Login error details:", {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+        })
         toast.error(error.message)
         return
       }
