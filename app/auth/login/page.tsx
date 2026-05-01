@@ -23,20 +23,12 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      console.log("[v0] Attempting login with email:", email)
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      console.log("[v0] Login response - data:", data, "error:", error)
-
       if (error) {
-        console.log("[v0] Login error details:", {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-        })
         toast.error(error.message)
         return
       }
@@ -80,7 +72,15 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link 
+                  href="/auth/forgot-password" 
+                  className="text-sm text-muted-foreground hover:text-primary"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
