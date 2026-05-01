@@ -1,22 +1,42 @@
-import { FolderOpen } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { DocumentsHeader } from '@/components/documents/documents-header'
+import { DocumentsTable } from '@/components/documents/documents-table'
+import type { Document, Client, TeamMember } from '@/lib/types'
 
-export default function DocumentsPage() {
+async function getData() {
+  const supabase = await createClient()
+  
+  const [documentsResult, clientsResult] = await Promise.all([
+    supabase
+      .from('documents')
+      .select('*, client:clients(*), uploaded_by_member:team_members!documents_uploaded_by_fkey(*)')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('clients')
+      .select('id, name')
+      .eq('status', 'active')
+      .order('name'),
+  ])
+
+  return {
+    documents: (documentsResult.data || []) as (Document & { 
+      client: Client, 
+      uploaded_by_member: TeamMember | null 
+    })[],
+    clients: clientsResult.data || [],
+  }
+}
+
+export default async function DocumentsPage() {
+  const { documents, clients } = await getData()
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Documents</h1>
-        <p className="text-muted-foreground">
-          Manage and organize client documents
-        </p>
-      </div>
-
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-muted-foreground/25 bg-muted/10 py-16">
-        <FolderOpen className="h-12 w-12 text-muted-foreground/50" />
-        <h3 className="mt-4 text-lg font-medium">No documents yet</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Document management coming soon
-        </p>
-      </div>
+      <DocumentsHeader clients={clients} />
+      <DocumentsTable 
+        documents={documents} 
+        clients={clients}
+      />
     </div>
   )
 }
