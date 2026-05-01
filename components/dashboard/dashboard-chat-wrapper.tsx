@@ -1,15 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { TaskChat } from './task-chat'
+import { QuickTaskForm } from './quick-task-form'
 
 export function DashboardChatWrapper() {
-  const router = useRouter()
-
-  const handleTaskCreated = () => {
-    // Refresh the page to show the new task
-    router.refresh()
-  }
-
-  return <TaskChat onTaskCreated={handleTaskCreated} />
+  return <QuickTaskForm />
 }
