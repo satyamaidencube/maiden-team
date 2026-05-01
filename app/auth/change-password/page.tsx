@@ -12,7 +12,6 @@ import { Building2, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function ChangePasswordPage() {
-  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -33,36 +32,10 @@ export default function ChangePasswordPage() {
       return
     }
 
-    if (currentPassword === newPassword) {
-      toast.error('New password must be different from current password')
-      return
-    }
-
     setIsLoading(true)
 
     try {
-      // First verify the current password by re-authenticating
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user?.email) {
-        toast.error('You must be logged in to change your password')
-        router.push('/auth/login')
-        return
-      }
-
-      // Verify current password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
-      })
-
-      if (signInError) {
-        toast.error('Current password is incorrect')
-        setIsLoading(false)
-        return
-      }
-
-      // Update to new password
+      // Force update password directly
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
       })
@@ -122,24 +95,12 @@ export default function ChangePasswordPage() {
           <div>
             <CardTitle className="text-2xl font-semibold tracking-tight">Change password</CardTitle>
             <CardDescription className="text-muted-foreground mt-1">
-              Enter your current password and choose a new one
+              Enter your new password below
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleChangePassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                placeholder="Enter your current password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="newPassword">New password</Label>
               <Input
