@@ -43,6 +43,8 @@
     "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "1.6.1",
     "@vercel/blob": "^2.3.1",
+    "ag-grid-community": "^35.2.1",
+    "ag-grid-react": "^35.2.1",
     "ai": "^6.0.174",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
