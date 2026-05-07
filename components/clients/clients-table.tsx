@@ -39,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { MoreHorizontal, Search, ArrowUpDown, Eye, Pencil, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Search, ArrowUpDown, Eye, Pencil, Trash2, X } from 'lucide-react'
 import { ClientFormDialog } from './client-form-dialog'
 import { ClientDetailSheet } from './client-detail-sheet'
 import { createClient } from '@/lib/supabase/client'
@@ -84,6 +84,7 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [showColumnFilters, setShowColumnFilters] = useState(true)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [editClient, setEditClient] = useState<Client | null>(null)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -367,57 +368,27 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
           />
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            value={(columnFilters.find(f => f.id === 'status')?.value as string) ?? 'all'}
-            onValueChange={(value) => {
-              if (value === 'all') {
-                setColumnFilters(prev => prev.filter(f => f.id !== 'status'))
-              } else {
-                setColumnFilters(prev => [
-                  ...prev.filter(f => f.id !== 'status'),
-                  { id: 'status', value }
-                ])
-              }
-            }}
+          <Button
+            variant={showColumnFilters ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowColumnFilters(!showColumnFilters)}
           >
-            <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="prospect">Prospect</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={(columnFilters.find(f => f.id === 'entity_type')?.value as string) ?? 'all'}
-            onValueChange={(value) => {
-              if (value === 'all') {
-                setColumnFilters(prev => prev.filter(f => f.id !== 'entity_type'))
-              } else {
-                setColumnFilters(prev => [
-                  ...prev.filter(f => f.id !== 'entity_type'),
-                  { id: 'entity_type', value }
-                ])
-              }
-            }}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Entity Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="Individual">Individual</SelectItem>
-              <SelectItem value="Proprietorship">Proprietorship</SelectItem>
-              <SelectItem value="Partnership">Partnership</SelectItem>
-              <SelectItem value="LLP">LLP</SelectItem>
-              <SelectItem value="Private Limited">Private Limited</SelectItem>
-              <SelectItem value="Public Limited">Public Limited</SelectItem>
-              <SelectItem value="Trust">Trust</SelectItem>
-              <SelectItem value="HUF">HUF</SelectItem>
-            </SelectContent>
-          </Select>
+            {showColumnFilters ? 'Hide Filters' : 'Show Filters'}
+          </Button>
+          {columnFilters.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setColumnFilters([])
+                table.resetColumnFilters()
+              }}
+              className="text-muted-foreground"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Clear All ({columnFilters.length})
+            </Button>
+          )}
         </div>
       </div>
 
@@ -428,7 +399,7 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="align-top">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -439,6 +410,76 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
                 ))}
               </TableRow>
             ))}
+            {/* Column Filter Row */}
+            {showColumnFilters && (
+              <TableRow className="bg-muted/30">
+                {table.getHeaderGroups()[0].headers.map((header) => (
+                  <TableHead key={`filter-${header.id}`} className="py-2 px-2">
+                    {header.id === 'actions' ? null : header.id === 'accounting_status' || header.id === 'inc_20a_status' || header.id === 'adt1_status' || header.id === 'status' ? (
+                      <Select
+                        value={(header.column.getFilterValue() as string) ?? ''}
+                        onValueChange={(value) => {
+                          header.column.setFilterValue(value === 'all' ? undefined : value)
+                        }}
+                      >
+                        <SelectTrigger className="h-7 text-xs">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          {header.id === 'accounting_status' && (
+                            <>
+                              <SelectItem value="Not required">Not required</SelectItem>
+                              <SelectItem value="To be done">To be done</SelectItem>
+                              <SelectItem value="Done">Done</SelectItem>
+                            </>
+                          )}
+                          {header.id === 'inc_20a_status' && (
+                            <>
+                              <SelectItem value="Filed">Filed</SelectItem>
+                              <SelectItem value="Not filed">Not filed</SelectItem>
+                              <SelectItem value="To Be Filed">To Be Filed</SelectItem>
+                            </>
+                          )}
+                          {header.id === 'adt1_status' && (
+                            <>
+                              <SelectItem value="Filed">Filed</SelectItem>
+                              <SelectItem value="Not filed">Not filed</SelectItem>
+                              <SelectItem value="To Be Filed">To Be Filed</SelectItem>
+                              <SelectItem value="Not required">Not required</SelectItem>
+                            </>
+                          )}
+                          {header.id === 'status' && (
+                            <>
+                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="inactive">Inactive</SelectItem>
+                              <SelectItem value="prospect">Prospect</SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    ) : header.column.getCanFilter() ? (
+                      <div className="relative">
+                        <Input
+                          placeholder="Filter..."
+                          value={(header.column.getFilterValue() as string) ?? ''}
+                          onChange={(e) => header.column.setFilterValue(e.target.value)}
+                          className="h-7 text-xs pr-6"
+                        />
+                        {header.column.getFilterValue() && (
+                          <button
+                            onClick={() => header.column.setFilterValue(undefined)}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                    ) : null}
+                  </TableHead>
+                ))}
+              </TableRow>
+            )}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
