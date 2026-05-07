@@ -67,6 +67,17 @@ const entityTypeShort: Record<EntityType, string> = {
   'Trust': 'TRUST',
   'HUF': 'HUF',
   'AOP/BOI': 'AOP',
+  'Section 8': 'S8',
+  'OPC': 'OPC',
+}
+
+const statusBadgeVariant = (status: string | null) => {
+  if (!status) return 'outline'
+  const s = status.toLowerCase()
+  if (s === 'filed' || s === 'done') return 'default'
+  if (s === 'to be done' || s === 'to be filed' || s === 'to be filed') return 'secondary'
+  if (s === 'not required') return 'outline'
+  return 'destructive'
 }
 
 export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTableProps) {
@@ -89,68 +100,165 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="-ml-4"
         >
-          Client Name
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
-        <div>
-          <p className="font-medium">{row.getValue('name')}</p>
-          <p className="text-xs text-muted-foreground">{row.original.contact_person}</p>
+        <div className="min-w-[180px]">
+          <p className="font-medium text-sm truncate">{row.getValue('name')}</p>
+          <p className="text-xs text-muted-foreground truncate">{row.original.contact_person}</p>
         </div>
       ),
     },
     {
-      accessorKey: 'entity_type',
-      header: 'Entity',
-      cell: ({ row }) => (
-        <Badge variant="outline" className="font-mono text-xs">
-          {entityTypeShort[row.getValue('entity_type') as EntityType]}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: 'pan',
-      header: 'PAN',
-      cell: ({ row }) => (
-        <span className="font-mono text-sm">{row.getValue('pan')}</span>
-      ),
-    },
-    {
-      accessorKey: 'gstin',
-      header: 'GSTIN',
+      accessorKey: 'registration_number',
+      header: 'REGN NO',
       cell: ({ row }) => (
         <span className="font-mono text-xs">
-          {row.getValue('gstin') || '-'}
+          {row.getValue('registration_number') || '-'}
         </span>
       ),
+    },
+    {
+      accessorKey: 'date_of_incorporation',
+      header: 'DOI',
+      cell: ({ row }) => {
+        const date = row.getValue('date_of_incorporation') as string | null
+        return (
+          <span className="text-xs">
+            {date ? new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-'}
+          </span>
+        )
+      },
     },
     {
       accessorKey: 'email',
       header: 'Contact',
       cell: ({ row }) => (
-        <div className="text-sm">
-          <p className="truncate max-w-[160px]">{row.original.email || '-'}</p>
-          <p className="text-xs text-muted-foreground">{row.original.phone}</p>
+        <div className="text-xs min-w-[140px]">
+          <p className="truncate">{row.original.email || '-'}</p>
+          <p className="text-muted-foreground">{row.original.phone}</p>
         </div>
       ),
     },
     {
       accessorKey: 'assigned_member',
-      header: 'Assigned To',
+      header: 'Allocated To',
       cell: ({ row }) => {
         const member = row.original.assigned_member
         return member ? (
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium">
-              {member.full_name.charAt(0)}
-            </div>
-            <span className="text-sm truncate max-w-[100px]">{member.full_name}</span>
-          </div>
+          <span className="text-xs truncate max-w-[80px] block">{member.full_name}</span>
         ) : (
-          <span className="text-sm text-muted-foreground">Unassigned</span>
+          <span className="text-xs text-muted-foreground">-</span>
         )
       },
+    },
+    {
+      accessorKey: 'accounting_status',
+      header: 'Accounting',
+      cell: ({ row }) => {
+        const status = row.getValue('accounting_status') as string | null
+        return (
+          <Badge variant={statusBadgeVariant(status)} className="text-xs whitespace-nowrap">
+            {status || '-'}
+          </Badge>
+        )
+      },
+    },
+    {
+      accessorKey: 'inc_20a_status',
+      header: 'INC 20A',
+      cell: ({ row }) => {
+        const status = row.getValue('inc_20a_status') as string | null
+        return (
+          <Badge variant={statusBadgeVariant(status)} className="text-xs">
+            {status || '-'}
+          </Badge>
+        )
+      },
+    },
+    {
+      accessorKey: 'adt1_status',
+      header: 'ADT-1',
+      cell: ({ row }) => {
+        const status = row.original.adt1_status
+        const date = row.original.adt1_due_date
+        return (
+          <div className="text-xs">
+            <Badge variant={statusBadgeVariant(status)} className="text-xs">
+              {status || '-'}
+            </Badge>
+            {date && <p className="text-muted-foreground mt-0.5">{new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' })}</p>}
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'adt1_srn',
+      header: 'ADT 1 SRN',
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">
+          {row.getValue('adt1_srn') || '-'}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'aoc4_status',
+      header: 'AOC-4',
+      cell: ({ row }) => {
+        const status = row.getValue('aoc4_status') as string | null
+        return status ? (
+          <Badge variant={statusBadgeVariant(status)} className="text-xs">
+            {status}
+          </Badge>
+        ) : <span className="text-xs text-muted-foreground">-</span>
+      },
+    },
+    {
+      accessorKey: 'mgt7a_status',
+      header: 'MGT-7A',
+      cell: ({ row }) => {
+        const status = row.getValue('mgt7a_status') as string | null
+        return status ? (
+          <Badge variant={statusBadgeVariant(status)} className="text-xs">
+            {status}
+          </Badge>
+        ) : <span className="text-xs text-muted-foreground">-</span>
+      },
+    },
+    {
+      accessorKey: 'itr_status',
+      header: 'ITR',
+      cell: ({ row }) => {
+        const status = row.getValue('itr_status') as string | null
+        return status ? (
+          <Badge variant={statusBadgeVariant(status)} className="text-xs">
+            {status}
+          </Badge>
+        ) : <span className="text-xs text-muted-foreground">-</span>
+      },
+    },
+    {
+      accessorKey: 'form_3cd_status',
+      header: '3CD',
+      cell: ({ row }) => {
+        const status = row.getValue('form_3cd_status') as string | null
+        return status ? (
+          <Badge variant={statusBadgeVariant(status)} className="text-xs">
+            {status}
+          </Badge>
+        ) : <span className="text-xs text-muted-foreground">-</span>
+      },
+    },
+    {
+      accessorKey: 'udin_annual_returns',
+      header: 'UDIN',
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">
+          {row.getValue('udin_annual_returns') || '-'}
+        </span>
+      ),
     },
     {
       accessorKey: 'status',
@@ -158,7 +266,7 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
       cell: ({ row }) => {
         const status = row.getValue('status') as ClientStatus
         return (
-          <Badge variant={statusColors[status]} className="capitalize">
+          <Badge variant={statusColors[status]} className="capitalize text-xs">
             {status}
           </Badge>
         )
@@ -314,8 +422,8 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[1400px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

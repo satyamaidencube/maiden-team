@@ -250,6 +250,11 @@ export interface ClientFormData {
   adt1_status?: FilingStatus;
   adt1_due_date?: string;
   adt1_srn?: string;
+  aoc4_status?: string;
+  mgt7a_status?: string;
+  itr_status?: string;
+  form_3cd_status?: string;
+  udin_annual_returns?: string;
 }
 
 export interface TaskFormData {
