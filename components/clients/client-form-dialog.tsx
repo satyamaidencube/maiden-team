@@ -64,6 +64,8 @@ const formSchema = z.object({
   accounting_status: z.enum(['Not required', 'To be done', 'Done']).optional(),
   inc_20a_status: z.enum(['Not filed', 'Filed', 'To Be Filed']).optional(),
   inc_20a_due_date: z.string().optional(),
+  adt1_status: z.enum(['Not filed', 'Filed', 'To Be Filed', 'To be filed', 'Not required']).optional(),
+  adt1_due_date: z.string().optional(),
   adt1_srn: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
@@ -112,6 +114,8 @@ export function ClientFormDialog({
       accounting_status: 'Not required',
       inc_20a_status: 'Not filed',
       inc_20a_due_date: '',
+      adt1_status: 'Not filed',
+      adt1_due_date: '',
       adt1_srn: '',
       email: '',
       phone: '',
@@ -140,6 +144,8 @@ export function ClientFormDialog({
         accounting_status: client.accounting_status || 'Not required',
         inc_20a_status: client.inc_20a_status || 'Not filed',
         inc_20a_due_date: client.inc_20a_due_date || '',
+        adt1_status: client.adt1_status || 'Not filed',
+        adt1_due_date: client.adt1_due_date || '',
         adt1_srn: client.adt1_srn || '',
         email: client.email || '',
         phone: client.phone || '',
@@ -191,6 +197,8 @@ export function ClientFormDialog({
         accounting_status: values.accounting_status || null,
         inc_20a_status: values.inc_20a_status || null,
         inc_20a_due_date: values.inc_20a_due_date || null,
+        adt1_status: values.adt1_status || null,
+        adt1_due_date: values.adt1_due_date || null,
         adt1_srn: values.adt1_srn || null,
         email: values.email || null,
         phone: values.phone || null,
@@ -562,6 +570,43 @@ export function ClientFormDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>INC-20A Due Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="adt1_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ADT-1 Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Not filed">Not filed</SelectItem>
+                            <SelectItem value="Filed">Filed</SelectItem>
+                            <SelectItem value="To Be Filed">To Be Filed</SelectItem>
+                            <SelectItem value="To be filed">To be filed</SelectItem>
+                            <SelectItem value="Not required">Not required</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="adt1_due_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ADT-1 Due Date</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} />
                         </FormControl>
