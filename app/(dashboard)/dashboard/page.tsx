@@ -14,6 +14,7 @@ import {
 import { formatDistanceToNow, format, isPast, isToday } from 'date-fns'
 import Link from 'next/link'
 import type { Task, ComplianceTracker, Client } from '@/lib/types'
+import { DashboardChatWrapper } from '@/components/dashboard/dashboard-chat-wrapper'
 
 async function getDashboardStats() {
   const supabase = await createClient()
@@ -114,6 +115,7 @@ export default async function DashboardPage() {
   ]
 
   return (
+    <>
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
@@ -241,5 +243,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
     </div>
+    <DashboardChatWrapper />
+    </>
   )
 }

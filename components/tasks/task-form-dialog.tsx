@@ -83,7 +83,7 @@ export function TaskFormDialog({
       status: 'pending',
       priority: 'medium',
       due_date: format(new Date(), 'yyyy-MM-dd'),
-      assigned_to: '',
+      assigned_to: 'unassigned',
     },
   })
 
@@ -97,7 +97,7 @@ export function TaskFormDialog({
         status: task.status,
         priority: task.priority,
         due_date: task.due_date,
-        assigned_to: task.assigned_to || '',
+        assigned_to: task.assigned_to || 'unassigned',
       })
     } else {
       form.reset({
@@ -108,7 +108,7 @@ export function TaskFormDialog({
         status: 'pending',
         priority: 'medium',
         due_date: format(new Date(), 'yyyy-MM-dd'),
-        assigned_to: '',
+        assigned_to: 'unassigned',
       })
     }
   }, [task, form])
@@ -125,7 +125,7 @@ export function TaskFormDialog({
         status: values.status,
         priority: values.priority,
         due_date: values.due_date,
-        assigned_to: values.assigned_to || null,
+        assigned_to: values.assigned_to === 'unassigned' ? null : (values.assigned_to || null),
       }
 
       if (isEditing) {
@@ -311,7 +311,7 @@ export function TaskFormDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
                       {teamMembers.map((member) => (
                         <SelectItem key={member.id} value={member.id}>
                           {member.full_name}

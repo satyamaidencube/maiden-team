@@ -11,7 +11,13 @@ export type EntityType =
   | 'Public Limited' 
   | 'Trust' 
   | 'HUF' 
-  | 'AOP/BOI';
+  | 'AOP/BOI'
+  | 'Section 8'
+  | 'OPC';
+
+export type AccountingStatus = 'Not required' | 'To be done' | 'Done';
+
+export type FilingStatus = 'Not filed' | 'Filed' | 'To Be Filed';
 
 export type ClientStatus = 'active' | 'inactive' | 'prospect';
 
@@ -59,7 +65,7 @@ export interface Client {
   name: string;
   entity_type: EntityType;
   gstin: string | null;
-  pan: string;
+  pan: string | null;
   tan: string | null;
   cin: string | null;
   email: string | null;
@@ -75,6 +81,19 @@ export interface Client {
   created_at: string;
   updated_at: string;
   created_by: string | null;
+  // New compliance fields
+  registration_number: string | null;
+  date_of_incorporation: string | null;
+  accounting_status: AccountingStatus | null;
+  inc_20a_status: FilingStatus | null;
+  inc_20a_due_date: string | null;
+  adt1_due_date: string | null;
+  adt1_srn: string | null;
+  aoc4_status: string | null;
+  mgt7a_status: string | null;
+  itr_status: string | null;
+  form_3cd_status: string | null;
+  udin_annual_returns: string | null;
   // Joined fields
   assigned_member?: TeamMember;
 }
@@ -208,7 +227,7 @@ export interface ClientFormData {
   name: string;
   entity_type: EntityType;
   gstin?: string;
-  pan: string;
+  pan?: string;
   tan?: string;
   cin?: string;
   email?: string;
@@ -221,6 +240,14 @@ export interface ClientFormData {
   status: ClientStatus;
   assigned_to?: string;
   notes?: string;
+  // New compliance fields
+  registration_number?: string;
+  date_of_incorporation?: string;
+  accounting_status?: AccountingStatus;
+  inc_20a_status?: FilingStatus;
+  inc_20a_due_date?: string;
+  adt1_due_date?: string;
+  adt1_srn?: string;
 }
 
 export interface TaskFormData {
