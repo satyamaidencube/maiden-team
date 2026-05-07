@@ -46,17 +46,25 @@ const entityTypes: EntityType[] = [
   'Trust',
   'HUF',
   'AOP/BOI',
+  'Section 8',
+  'OPC',
 ]
 
 const clientStatuses: ClientStatus[] = ['active', 'inactive', 'prospect']
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  entity_type: z.enum(['Individual', 'Proprietorship', 'Partnership', 'LLP', 'Private Limited', 'Public Limited', 'Trust', 'HUF', 'AOP/BOI']),
-  pan: z.string().min(10, 'PAN must be 10 characters').max(10, 'PAN must be 10 characters').toUpperCase(),
+  entity_type: z.enum(['Individual', 'Proprietorship', 'Partnership', 'LLP', 'Private Limited', 'Public Limited', 'Trust', 'HUF', 'AOP/BOI', 'Section 8', 'OPC']),
+  pan: z.string().optional(),
   gstin: z.string().optional(),
   tan: z.string().optional(),
   cin: z.string().optional(),
+  registration_number: z.string().optional(),
+  date_of_incorporation: z.string().optional(),
+  accounting_status: z.enum(['Not required', 'To be done', 'Done']).optional(),
+  inc_20a_status: z.enum(['Not filed', 'Filed', 'To Be Filed']).optional(),
+  inc_20a_due_date: z.string().optional(),
+  adt1_srn: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().optional(),
@@ -99,6 +107,12 @@ export function ClientFormDialog({
       gstin: '',
       tan: '',
       cin: '',
+      registration_number: '',
+      date_of_incorporation: '',
+      accounting_status: 'Not required',
+      inc_20a_status: 'Not filed',
+      inc_20a_due_date: '',
+      adt1_srn: '',
       email: '',
       phone: '',
       address: '',
@@ -117,10 +131,16 @@ export function ClientFormDialog({
       form.reset({
         name: client.name,
         entity_type: client.entity_type,
-        pan: client.pan,
+        pan: client.pan || '',
         gstin: client.gstin || '',
         tan: client.tan || '',
         cin: client.cin || '',
+        registration_number: client.registration_number || '',
+        date_of_incorporation: client.date_of_incorporation || '',
+        accounting_status: client.accounting_status || 'Not required',
+        inc_20a_status: client.inc_20a_status || 'Not filed',
+        inc_20a_due_date: client.inc_20a_due_date || '',
+        adt1_srn: client.adt1_srn || '',
         email: client.email || '',
         phone: client.phone || '',
         address: client.address || '',
@@ -162,9 +182,16 @@ export function ClientFormDialog({
       
       const clientData = {
         ...values,
+        pan: values.pan || null,
         gstin: values.gstin || null,
         tan: values.tan || null,
         cin: values.cin || null,
+        registration_number: values.registration_number || null,
+        date_of_incorporation: values.date_of_incorporation || null,
+        accounting_status: values.accounting_status || null,
+        inc_20a_status: values.inc_20a_status || null,
+        inc_20a_due_date: values.inc_20a_due_date || null,
+        adt1_srn: values.adt1_srn || null,
         email: values.email || null,
         phone: values.phone || null,
         address: values.address || null,
@@ -260,6 +287,43 @@ export function ClientFormDialog({
                 </div>
               </div>
 
+              {/* Company Registration */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium">Company Registration</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="registration_number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Registration No (CIN/LLPIN)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="U72200TG2021PTC155682" 
+                            {...field} 
+                            onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="date_of_incorporation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Incorporation</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
               {/* Tax Identifiers */}
               <div className="space-y-4">
                 <h3 className="text-sm font-medium">Tax Identifiers</h3>
@@ -269,7 +333,7 @@ export function ClientFormDialog({
                     name="pan"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>PAN *</FormLabel>
+                        <FormLabel>PAN</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="ABCDE1234F" 
@@ -436,6 +500,83 @@ export function ClientFormDialog({
                         <FormLabel>Pincode</FormLabel>
                         <FormControl>
                           <Input placeholder="400001" {...field} maxLength={6} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Compliance Status */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium">Compliance Status</h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="accounting_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Accounting Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Not required">Not required</SelectItem>
+                            <SelectItem value="To be done">To be done</SelectItem>
+                            <SelectItem value="Done">Done</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="inc_20a_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>INC-20A Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Not filed">Not filed</SelectItem>
+                            <SelectItem value="Filed">Filed</SelectItem>
+                            <SelectItem value="To Be Filed">To Be Filed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="inc_20a_due_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>INC-20A Due Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="adt1_srn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ADT-1 SRN</FormLabel>
+                        <FormControl>
+                          <Input placeholder="T31857188" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
