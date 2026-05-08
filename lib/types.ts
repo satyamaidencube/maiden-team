@@ -17,7 +17,7 @@ export type EntityType =
 
 export type AccountingStatus = 'Not required' | 'To be done' | 'Done';
 
-export type FilingStatus = 'Not filed' | 'Filed' | 'To Be Filed';
+export type FilingStatus = 'Not filed' | 'Filed' | 'To Be Filed' | 'To be filed' | 'Not required';
 
 export type ClientStatus = 'active' | 'inactive' | 'prospect';
 
@@ -87,6 +87,7 @@ export interface Client {
   accounting_status: AccountingStatus | null;
   inc_20a_status: FilingStatus | null;
   inc_20a_due_date: string | null;
+  adt1_status: FilingStatus | null;
   adt1_due_date: string | null;
   adt1_srn: string | null;
   aoc4_status: string | null;
@@ -246,8 +247,14 @@ export interface ClientFormData {
   accounting_status?: AccountingStatus;
   inc_20a_status?: FilingStatus;
   inc_20a_due_date?: string;
+  adt1_status?: FilingStatus;
   adt1_due_date?: string;
   adt1_srn?: string;
+  aoc4_status?: string;
+  mgt7a_status?: string;
+  itr_status?: string;
+  form_3cd_status?: string;
+  udin_annual_returns?: string;
 }
 
 export interface TaskFormData {

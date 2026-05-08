@@ -64,7 +64,14 @@ const formSchema = z.object({
   accounting_status: z.enum(['Not required', 'To be done', 'Done']).optional(),
   inc_20a_status: z.enum(['Not filed', 'Filed', 'To Be Filed']).optional(),
   inc_20a_due_date: z.string().optional(),
+  adt1_status: z.enum(['Not filed', 'Filed', 'To Be Filed', 'To be filed', 'Not required']).optional(),
+  adt1_due_date: z.string().optional(),
   adt1_srn: z.string().optional(),
+  aoc4_status: z.string().optional(),
+  mgt7a_status: z.string().optional(),
+  itr_status: z.string().optional(),
+  form_3cd_status: z.string().optional(),
+  udin_annual_returns: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().optional(),
@@ -112,7 +119,14 @@ export function ClientFormDialog({
       accounting_status: 'Not required',
       inc_20a_status: 'Not filed',
       inc_20a_due_date: '',
+      adt1_status: 'Not filed',
+      adt1_due_date: '',
       adt1_srn: '',
+      aoc4_status: '',
+      mgt7a_status: '',
+      itr_status: '',
+      form_3cd_status: '',
+      udin_annual_returns: '',
       email: '',
       phone: '',
       address: '',
@@ -140,7 +154,14 @@ export function ClientFormDialog({
         accounting_status: client.accounting_status || 'Not required',
         inc_20a_status: client.inc_20a_status || 'Not filed',
         inc_20a_due_date: client.inc_20a_due_date || '',
+        adt1_status: client.adt1_status || 'Not filed',
+        adt1_due_date: client.adt1_due_date || '',
         adt1_srn: client.adt1_srn || '',
+        aoc4_status: client.aoc4_status || '',
+        mgt7a_status: client.mgt7a_status || '',
+        itr_status: client.itr_status || '',
+        form_3cd_status: client.form_3cd_status || '',
+        udin_annual_returns: client.udin_annual_returns || '',
         email: client.email || '',
         phone: client.phone || '',
         address: client.address || '',
@@ -191,7 +212,14 @@ export function ClientFormDialog({
         accounting_status: values.accounting_status || null,
         inc_20a_status: values.inc_20a_status || null,
         inc_20a_due_date: values.inc_20a_due_date || null,
+        adt1_status: values.adt1_status || null,
+        adt1_due_date: values.adt1_due_date || null,
         adt1_srn: values.adt1_srn || null,
+        aoc4_status: values.aoc4_status || null,
+        mgt7a_status: values.mgt7a_status || null,
+        itr_status: values.itr_status || null,
+        form_3cd_status: values.form_3cd_status || null,
+        udin_annual_returns: values.udin_annual_returns || null,
         email: values.email || null,
         phone: values.phone || null,
         address: values.address || null,
@@ -571,12 +599,114 @@ export function ClientFormDialog({
                   />
                   <FormField
                     control={form.control}
+                    name="adt1_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ADT-1 Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Not filed">Not filed</SelectItem>
+                            <SelectItem value="Filed">Filed</SelectItem>
+                            <SelectItem value="To Be Filed">To Be Filed</SelectItem>
+                            <SelectItem value="To be filed">To be filed</SelectItem>
+                            <SelectItem value="Not required">Not required</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="adt1_due_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ADT-1 Due Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="adt1_srn"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>ADT-1 SRN</FormLabel>
                         <FormControl>
                           <Input placeholder="T31857188" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="aoc4_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>AOC-4 Status</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Filed / Not required" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mgt7a_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>MGT-7A Status</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Filed / Not required" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="itr_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ITR Status</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Filed / Not required" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="form_3cd_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>3CD Status</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Filed / Not required" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="udin_annual_returns"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>UDIN (Annual Returns)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="F90008285" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
