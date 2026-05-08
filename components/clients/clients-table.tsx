@@ -15,11 +15,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Search, Eye, Pencil, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Search, Eye, Pencil, Trash2, Download } from 'lucide-react'
 import { ClientFormDialog } from './client-form-dialog'
 import { ClientDetailSheet } from './client-detail-sheet'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { exportToExcel, exportToPDF } from '@/lib/export-utils'
 import type { Client, TeamMember, ClientStatus } from '@/lib/types'
 
 // Register AG Grid modules
@@ -333,8 +334,8 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
 
   return (
     <div className="space-y-4">
-      {/* Quick Filter */}
-      <div className="flex items-center gap-4">
+      {/* Header with Export */}
+      <div className="flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -347,6 +348,30 @@ export function ClientsTable({ clients: initialClients, teamMembers }: ClientsTa
         <p className="text-sm text-muted-foreground">
           {initialClients.length} client(s)
         </p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Export as</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => {
+              exportToExcel(initialClients, `clients_${new Date().toISOString().split('T')[0]}.xlsx`)
+              toast.success('Exported to Excel')
+            }}>
+              <span>Excel (.xlsx)</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              exportToPDF(initialClients, `clients_${new Date().toISOString().split('T')[0]}.pdf`)
+              toast.success('PDF opened in print dialog')
+            }}>
+              <span>PDF</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* AG Grid */}
